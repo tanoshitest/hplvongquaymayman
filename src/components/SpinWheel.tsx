@@ -1,18 +1,18 @@
 import { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { PRIZES } from '@/data/mockData';
+import type { Prize } from '@/data/mockData';
 
 interface SpinWheelProps {
   spinning: boolean;
   targetIndex: number;
   onFinished: () => void;
+  prizes: Prize[];
 }
 
-const SEGMENT_COUNT = PRIZES.length;
-const SEGMENT_ANGLE = 360 / SEGMENT_COUNT;
-
-const SpinWheel = ({ spinning, targetIndex, onFinished }: SpinWheelProps) => {
+const SpinWheel = ({ spinning, targetIndex, onFinished, prizes }: SpinWheelProps) => {
   const hasTriggered = useRef(false);
+  const SEGMENT_COUNT = prizes.length;
+  const SEGMENT_ANGLE = 360 / SEGMENT_COUNT;
 
   useEffect(() => {
     if (spinning) hasTriggered.current = false;
@@ -59,7 +59,7 @@ const SpinWheel = ({ spinning, targetIndex, onFinished }: SpinWheelProps) => {
       >
         <svg viewBox="0 0 500 500" className="w-full h-full">
           <defs>
-            {PRIZES.map((_, i) => {
+            {prizes.map((_, i) => {
               const midAngle = i * SEGMENT_ANGLE - 90 + SEGMENT_ANGLE / 2;
               const midRad = (midAngle * Math.PI) / 180;
               // Path from outer edge toward center
@@ -79,7 +79,7 @@ const SpinWheel = ({ spinning, targetIndex, onFinished }: SpinWheelProps) => {
             })}
           </defs>
 
-          {PRIZES.map((prize, i) => {
+          {prizes.map((prize, i) => {
             const startAngle = i * SEGMENT_ANGLE - 90;
             const endAngle = startAngle + SEGMENT_ANGLE;
             const startRad = (startAngle * Math.PI) / 180;

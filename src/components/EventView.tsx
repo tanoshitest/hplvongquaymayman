@@ -4,14 +4,16 @@ import { Settings } from 'lucide-react';
 import hplLogo from '@/assets/hpl-logo.png';
 import SpinWheel from './SpinWheel';
 import WinnerModal from './WinnerModal';
-import { PRIZES, USERS } from '@/data/mockData';
 import type { Prize, User } from '@/data/mockData';
 
 interface EventViewProps {
   onGoAdmin: () => void;
+  users: User[];
+  setUsers: React.Dispatch<React.SetStateAction<User[]>>;
+  prizes: Prize[];
 }
 
-const EventView = ({ onGoAdmin }: EventViewProps) => {
+const EventView = ({ onGoAdmin, users, setUsers, prizes }: EventViewProps) => {
   const [customerCode, setCustomerCode] = useState('');
   const [isSpinning, setIsSpinning] = useState(false);
   const [winner, setWinner] = useState<Prize | null>(null);
@@ -20,27 +22,54 @@ const EventView = ({ onGoAdmin }: EventViewProps) => {
   const [showModal, setShowModal] = useState(false);
 
   const handleSpin = useCallback(() => {
-    const user = USERS.find(u => u.code.toUpperCase() === customerCode.trim().toUpperCase());
+    const user = users.find(u => u.code.toUpperCase() === customerCode.trim().toUpperCase());
     if (!user) {
       alert('Mã khách hàng không hợp lệ (Thử: KH001 - KH500)');
       return;
     }
+    
+    if (user.status === 'đã quay') {
+      alert('Khách hàng này đã thực hiện lượt quay!');
+      return;
+    }
+
     setCurrentUser(user);
-    const idx = Math.floor(Math.random() * PRIZES.length);
+    
+    let idx;
+    if (!user.allowedToWin) {
+      // Find "May mắn lần sau" index
+      idx = prizes.findIndex(p => p.name === 'May mắn lần sau');
+      if (idx === -1) idx = 0; // Fallback
+    } else {
+      // Filter out the loss prize for a win spin
+      const winPrizes = prizes.filter(p => p.name !== 'May mắn lần sau');
+      const randomWinPrize = winPrizes[Math.floor(Math.random() * winPrizes.length)];
+      idx = prizes.findIndex(p => p.id === randomWinPrize.id);
+    }
+    
     setTargetIndex(idx);
-    setWinner(PRIZES[idx]);
+    setWinner(prizes[idx]);
     setIsSpinning(true);
-  }, [customerCode]);
+  }, [customerCode, users, prizes]);
 
   const handleFinished = useCallback(() => {
     setIsSpinning(false);
     setShowModal(true);
-  }, []);
+    
+    if (currentUser && winner) {
+      setUsers(prev => prev.map(u => 
+        u.id === currentUser.id 
+          ? { ...u, status: 'đã quay', result: winner.name }
+          : u
+      ));
+    }
+  }, [currentUser, winner, setUsers]);
 
   const handleCloseModal = useCallback(() => {
     setShowModal(false);
     setWinner(null);
     setCustomerCode('');
+    setCurrentUser(null);
   }, []);
 
   return (
@@ -82,6 +111,7 @@ const EventView = ({ onGoAdmin }: EventViewProps) => {
                 spinning={isSpinning}
                 targetIndex={targetIndex}
                 onFinished={handleFinished}
+                prizes={prizes}
               />
             </div>
 

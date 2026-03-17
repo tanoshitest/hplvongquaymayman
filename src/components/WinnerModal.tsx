@@ -28,14 +28,14 @@ const WinnerModal = ({ winner, user, visible, onClose }: WinnerModalProps) => {
             <div className="absolute top-0 left-0 w-full h-2 bg-secondary" />
             <div className="text-6xl mb-6">{winner.icon}</div>
             <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-secondary mb-2">
-              Chúc mừng khách hàng
+              {winner.name === 'May mắn lần sau' ? 'Rất tiếc' : 'Chúc mừng khách hàng'}
             </h3>
             <p className="text-3xl font-black text-primary mb-1 font-display">{user.name}</p>
             <p className="text-primary/60 font-medium mb-8">Mã số: {user.code}</p>
 
             <div className="bg-surface rounded-2xl p-6 border border-primary/5 mb-8">
               <p className="text-[10px] font-bold uppercase tracking-widest text-primary/40 mb-1">
-                Bạn đã trúng giải
+                {winner.name === 'May mắn lần sau' ? 'Kết quả của bạn' : 'Bạn đã trúng giải'}
               </p>
               <p className="text-2xl font-black text-secondary">{winner.name}</p>
             </div>

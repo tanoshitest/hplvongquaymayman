@@ -11,6 +11,9 @@ export interface User {
   code: string;
   name: string;
   phone: string;
+  allowedToWin: boolean;
+  status: 'chưa quay' | 'đã quay';
+  result?: string;
 }
 
 export const PRIZES: Prize[] = [
@@ -26,6 +29,7 @@ export const PRIZES: Prize[] = [
   { id: 10, name: "Sổ Tay Da 20 Năm", icon: "📓", qty: 100, chance: 10 },
   { id: 11, name: "Mũ Bảo Hiểm Cao Cấp", icon: "🪖", qty: 40, chance: 8 },
   { id: 12, name: "Voucher 500.000đ", icon: "🎫", qty: 50, chance: 2 },
+  { id: 0, name: "May mắn lần sau", icon: "🍀", qty: 999, chance: 0 },
 ];
 
 const familyNames = ["Nguyễn", "Trần", "Lê", "Phạm", "Hoàng", "Huỳnh", "Phan", "Vũ", "Đặng", "Bùi"];
@@ -37,4 +41,6 @@ export const USERS: User[] = Array.from({ length: 500 }, (_, i) => ({
   code: `KH${(i + 1).toString().padStart(3, '0')}`,
   name: `${familyNames[i % familyNames.length]} ${middleNames[(i * 3 + 1) % middleNames.length]} ${firstNames[(i * 7 + 2) % firstNames.length]}`,
   phone: `09${(10000000 + ((i * 73 + 17) * 9301 + 49297) % 90000000).toString().slice(0, 8)}`,
+  allowedToWin: true,
+  status: 'chưa quay',
 }));
